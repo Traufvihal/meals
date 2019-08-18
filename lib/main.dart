@@ -24,27 +24,46 @@ class _MyAppState extends State<MyApp> {
   };
 
   List<Meal> _availableMeals = DUMMY_MEALS;
+  List<Meal> _favoriteMeals = [];
 
-  void _setFilters(Map<String, bool> filtersData){
+  void _setFilters(Map<String, bool> filtersData) {
     setState(() {
       _filters = filtersData;
 
       _availableMeals = DUMMY_MEALS.where((meal) {
-        if(_filters['gluten'] && !meal.isGlutenFree){
+        if (_filters['gluten'] && !meal.isGlutenFree) {
           return false;
         }
-        if(_filters['lactose'] && !meal.isLactoseFree){
+        if (_filters['lactose'] && !meal.isLactoseFree) {
           return false;
         }
-        if(_filters['vegan'] && !meal.isVegan){
+        if (_filters['vegan'] && !meal.isVegan) {
           return false;
         }
-        if(_filters['vegetarian'] && !meal.isVegetarian){
+        if (_filters['vegetarian'] && !meal.isVegetarian) {
           return false;
         }
         return true;
       }).toList();
     });
+  }
+
+  void _toggleFavorite(String mealId) {
+    final existingIndex =
+        _favoriteMeals.indexWhere((meal) => meal.id == mealId);
+    if (existingIndex >= 0) {
+      setState(() {
+        _favoriteMeals.removeAt(existingIndex);
+      });
+    } else {
+      setState(() {
+        _favoriteMeals.add(DUMMY_MEALS.firstWhere((meal) => meal.id == mealId));
+      });
+    }
+  }
+
+  bool _isMealFavorite(String id){
+    return _favoriteMeals.any((meal) => meal.id == id);
   }
 
   @override
@@ -73,9 +92,10 @@ class _MyAppState extends State<MyApp> {
       // home: CategoriesScreen(),
       initialRoute: '/',
       routes: {
-        '/': (ctx) => TabScreen(),
-        CategoryMealsScreen.routeName: (ctx) => CategoryMealsScreen(_availableMeals),
-        MealDetailScreen.routeName: (ctx) => MealDetailScreen(),
+        '/': (ctx) => TabScreen(_favoriteMeals),
+        CategoryMealsScreen.routeName: (ctx) =>
+            CategoryMealsScreen(_availableMeals),
+        MealDetailScreen.routeName: (ctx) => MealDetailScreen(_toggleFavorite, _isMealFavorite),
         FiltersScreen.routeName: (ctx) => FiltersScreen(_filters, _setFilters),
       },
       onGenerateRoute: (settings) {
