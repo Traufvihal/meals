@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../dummy-data.dart';
 
 class MealDetailScreen extends StatelessWidget {
-  static const routName = '/meal-detail';
+  static const routeName = '/meal-detail';
 
   Widget buildSectionTitle(BuildContext context, String text) {
     return Container(
